@@ -7,7 +7,7 @@ import { StoreModule } from './stores/store.module';
 
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true, // Makes the ConfigModule available throughout your application
+      isGlobal: true,
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],

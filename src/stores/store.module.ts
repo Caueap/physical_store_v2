@@ -13,4 +13,4 @@ import { Store, StoreSchema } from './schemas/store.schema';
   controllers: [StoreController],
   providers: [StoreService],
 })
-export class StoreModule { }
+export class StoreModule {}
