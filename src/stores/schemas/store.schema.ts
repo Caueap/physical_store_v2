@@ -24,12 +24,6 @@ export class Store {
   address1: string;
 
   @Prop()
-  address2: string;
-
-  @Prop()
-  address3: string;
-
-  @Prop()
   city: string;
 
   @Prop()
