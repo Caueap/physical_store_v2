@@ -24,6 +24,14 @@ export class StoreService {
     };
   }
 
+  async getStoreById(id: string): Promise<Store> {
+    const store = await this.storeModel.findById(id);
+    if (!store) {
+      throw new NotFoundException('Store not found');
+    }
+    return store;
+  }
+
   async createStore(createStoreDto: CreateStoreDto): Promise<Store> {
     const createdStore = new this.storeModel(createStoreDto);
     return createdStore.save();
