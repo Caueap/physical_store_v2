@@ -1,12 +1,20 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query, ValidationPipe, Post, Body } from '@nestjs/common';
 import { StoreService } from './store.service';
+import { CreateStoreDto } from './dtos/create-store.dto';
+import { GetAllStoresDto } from './dtos/get-all-stores.dto';
 
-@Controller()
+@Controller('stores')
 export class StoreController {
-  constructor(private readonly storeService: StoreService) {}
+  constructor(private readonly storeService: StoreService) { }
 
   @Get()
-  getHello(): string {
-    return this.storeService.getHello();
+  async getAllStores(@Query(new ValidationPipe({ transform: true })) query: GetAllStoresDto) {
+    const { limit = 10, offset = 0 } = query;
+    return this.storeService.getAllStores(limit, offset);
+  }
+
+  @Post()
+  async createStore(@Body() createStoreDto: CreateStoreDto) {
+    return this.storeService.createStore(createStoreDto);
   }
 }
