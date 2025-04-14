@@ -1,7 +1,20 @@
-import { IsString, IsBoolean, IsNumber, IsOptional, IsIn } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
+
+export enum StoreType {
+  LOJA = 'LOJA',
+  PDV = 'PDV',
+}
 
 export class CreateStoreDto {
   @IsString()
+  @IsNotEmpty()
   storeName: string;
 
   @IsBoolean()
@@ -10,47 +23,42 @@ export class CreateStoreDto {
   @IsNumber()
   shippingTimeInDays: number;
 
-  @IsOptional()
-  @IsString()
-  latitude?: string;
+  @IsEnum(StoreType)
+  readonly type: StoreType = StoreType.LOJA;
 
-  @IsOptional()
   @IsString()
-  longitude?: string;
+  @IsNotEmpty()
+  street: string;
 
-  @IsOptional()
   @IsString()
-  address1?: string;
+  @IsNotEmpty()
+  number: string;
 
-  @IsOptional()
   @IsString()
-  city?: string;
-
   @IsOptional()
+  complement?: string;
+
   @IsString()
-  district?: string;
+  @IsNotEmpty()
+  district: string;
 
-  @IsOptional()
   @IsString()
-  state?: string;
+  @IsNotEmpty()
+  city: string;
 
-  @IsOptional()
-  @IsIn(['PDV', 'LOJA'])
-  type?: string;
-
-  @IsOptional()
   @IsString()
-  country?: string;
+  @IsNotEmpty()
+  state: string;
 
-  @IsOptional()
   @IsString()
-  postalCode?: string;
+  @IsNotEmpty()
+  postalCode: string;
 
-  @IsOptional()
   @IsString()
-  telephoneNumber?: string;
+  @IsOptional()
+  contactEmail?: string;
 
-  @IsOptional()
   @IsString()
-  emailAddress?: string;
+  @IsOptional()
+  contactPhone?: string;
 }

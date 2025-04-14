@@ -3,6 +3,7 @@ import { StoreService } from './store.service';
 import { CreateStoreDto } from './dtos/create-store.dto';
 import { GetAllStoresDto } from './dtos/get-all-stores.dto';
 import { GetStoresByStateDto } from './dtos/get-stores-by-states.dto';
+import { CreatePdvDto } from './dtos/create-pdv.dto';
 
 @Controller('stores')
 export class StoreController {
@@ -33,7 +34,12 @@ export class StoreController {
   }
 
   @Post()
-  async createStore(@Body() createStoreDto: CreateStoreDto) {
-    return this.storeService.createStore(createStoreDto);
+  createStore(@Body() dto: CreateStoreDto) {
+    return this.storeService.createStore(dto);
+  }
+
+  @Post('pdv')
+  createPdv(@Body() dto: CreatePdvDto) {
+    return this.storeService.createPdv(dto);
   }
 }

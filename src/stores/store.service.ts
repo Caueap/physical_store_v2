@@ -1,23 +1,29 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Store, StoreDocument } from './schemas/store.schema';
+import { Model, Types } from 'mongoose';
+import { Store, StoreDocument } from './models/store.model';
 import { CreateStoreDto } from './dtos/create-store.dto';
 import { getFullStateName } from '../utils/functions';
 import { paginate } from 'src/utils/functions';
+import { lastValueFrom } from 'rxjs';
+import { CreatePdvDto } from './dtos/create-pdv.dto';
+import { Pdv, PdvDocument } from './models/pdv.model';
 
 @Injectable()
 export class StoreService {
   constructor(
-    @InjectModel(Store.name) private storeModel: Model<StoreDocument>,
+    @InjectModel(Store.name) private StoreModel: Model<StoreDocument>,
+    @InjectModel(Pdv.name) private PdvModel: Model<PdvDocument>,
     private httpService: HttpService,
-  ) {}
+    private configService: ConfigService,
+  ) { }
 
   async getAllStores(limit: number, offset: number): Promise<any> {
-    const allStores = await this.storeModel.find().exec();
+    const allStores = await this.StoreModel.find().populate({ path: 'pdvs', model: 'Pdv' }).exec();
     const paginatedStores = paginate(allStores, limit, offset);
-  
+
     return {
       stores: paginatedStores,
       limit,
@@ -41,7 +47,7 @@ export class StoreService {
     }
 
     const filter = { state: new RegExp(`^${fullStateName}$`, 'i') };
-    const stores = await this.storeModel.find(filter).exec();
+    const stores = await this.StoreModel.find(filter).populate('pdvs').exec();
 
     if (!stores || stores.length === 0) {
       throw new NotFoundException(`No stores found in state ${fullStateName}`);
@@ -59,7 +65,7 @@ export class StoreService {
   }
 
   private async getStoresGroupedByState(limit: number, offset: number): Promise<any> {
-    const stores = await this.storeModel.find({}).exec();
+    const stores = await this.StoreModel.find({}).exec();
 
     if (!stores || stores.length === 0) {
       throw new NotFoundException('No stores found');
@@ -92,15 +98,35 @@ export class StoreService {
   }
 
   async getStoreById(id: string): Promise<Store> {
-    const store = await this.storeModel.findById(id);
+    const store = await this.StoreModel.findById(id).populate('pdvs').exec();
     if (!store) {
       throw new NotFoundException('Store not found');
     }
     return store;
   }
 
-  async createStore(createStoreDto: CreateStoreDto): Promise<Store> {
-    const createdStore = new this.storeModel(createStoreDto);
-    return createdStore.save();
+  async createStore(dto: CreateStoreDto) {
+    return this.StoreModel.create({
+      ...dto,
+      type: 'LOJA',
+    });
+  }
+
+  async createPdv(dto: CreatePdvDto) {
+    const parent = await this.StoreModel.findById(dto.parentStoreId);
+    if (!parent || parent.type !== 'LOJA') {
+      throw new BadRequestException('Invalid or non-store parentStoreId');
+    }
+
+    const pdv = await this.PdvModel.create({
+      ...dto,
+      store: dto.parentStoreId,
+      type: 'PDV',
+    });
+
+    parent.pdvs.push(pdv._id as Types.ObjectId);
+    await parent.save();
+
+    return pdv;
   }
 }
