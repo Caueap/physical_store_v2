@@ -1,7 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
-
-export type StoreDocument = Store & Document;
+import { Document, Types } from 'mongoose';
 
 @Schema()
 export class Store {
@@ -32,7 +30,7 @@ export class Store {
   @Prop()
   state: string;
 
-  @Prop({ enum: ['PDV', 'LOJA'] })
+  @Prop({ default: 'LOJA', enum: ['LOJA'] })
   type: string;
 
   @Prop()
@@ -46,6 +44,10 @@ export class Store {
 
   @Prop()
   emailAddress: string;
+
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Pdv' }] })
+  pdvs: Types.ObjectId[];
 }
 
+export type StoreDocument = Store & Document;
 export const StoreSchema = SchemaFactory.createForClass(Store);
