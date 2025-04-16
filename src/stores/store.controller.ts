@@ -15,6 +15,11 @@ export class StoreController {
     return this.storeService.getAllStores(limit, offset);
   }
 
+  @Get('by-cep/:cep')
+  async getStoresByCep(@Param('cep') cep: string) {
+    return this.storeService.getStoresByCep(cep);
+  }
+
   @Get('stores-by-state')
   async getStoresByState(
     @Query(new ValidationPipe({ transform: true })) query: GetStoresByStateDto,
