@@ -1,10 +1,12 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { StoreModule } from './stores/store.module';
+import { StoresModule } from './domains/stores/stores.module';
+import { PdvsModule } from './domains/pdvs/pdvs.module';
+import { LoggerMiddleware } from './common/middleware/logger.middleware';
+import { CommonModule } from './common/common.module';
 
 @Module({
-
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
@@ -13,13 +15,29 @@ import { StoreModule } from './stores/store.module';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        const database = configService.get<string>('DATABASE') as string;
-        const password = configService.get<string>('DATABASE_PASSWORD') as string;
-        const uri = database.replace('<PASSWORD>', password);
-        return { uri };
+        const dbConnectionString = configService.get<string>('DATABASE') || '';
+        const password = configService.get<string>('DATABASE_PASSWORD') || '';
+
+        if (!dbConnectionString) {
+          throw new Error('Database connection string not found in environment variables');
+        }
+
+        const uri = dbConnectionString.replace('<PASSWORD>', password);
+
+        return {
+          uri,
+        };
       },
     }),
-    StoreModule,
+    CommonModule,
+    StoresModule,
+    PdvsModule,
   ],
+  providers: [
+  ]
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+  consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}
