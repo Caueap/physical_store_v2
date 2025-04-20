@@ -5,6 +5,8 @@ import { StoresModule } from './domains/stores/stores.module';
 import { PdvsModule } from './domains/pdvs/pdvs.module';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { CommonModule } from './common/common.module';
+import { CacheModule } from './common/cache/cache.module';
+import { ProvidersModule } from './infrastructure/providers.module';
 
 @Module({
   imports: [
@@ -29,6 +31,8 @@ import { CommonModule } from './common/common.module';
         };
       },
     }),
+    CacheModule,
+    ProvidersModule,
     CommonModule,
     StoresModule,
     PdvsModule,

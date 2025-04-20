@@ -37,7 +37,8 @@ export class GoogleDistanceService implements DistanceService {
     return distances.map(item => ({
       distance: item.distance?.text || 'N/A',
       duration: item.duration?.text || 'N/A',
-      distanceValue: item.distance?.value || 0
+      distanceValue: item.distance?.value || 0,
+      distanceKm: (item.distance?.value || 0) / 1000
     }));
   }
 } 
