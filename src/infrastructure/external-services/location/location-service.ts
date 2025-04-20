@@ -10,9 +10,9 @@ export class LocationServiceImpl implements LocationService {
   constructor(
     @Inject('ViaCepService')
     private viaCepService: ViaCepService,
-    @Inject('GeocodingService')
+    @Inject('CachedGeocodingService')
     private geocodingService: GeocodingService,
-    @Inject('DistanceService')
+    @Inject('CachedDistanceService')
     private distanceService: DistanceService,
   ) {}
 

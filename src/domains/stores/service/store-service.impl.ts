@@ -19,7 +19,7 @@ export class StoreServiceImpl implements StoreService {
   constructor(
     @Inject('StoreRepository')
     private storeRepository: StoreRepository,
-    @Inject('ShippingService')
+    @Inject('CachedShippingService')
     private shippingService: ShippingService,
     @Inject('LocationService')
     private locationService: LocationService,

@@ -18,7 +18,7 @@ export class PdvServiceImpl implements PdvService {
   constructor(
     @Inject('PdvRepository')
     private readonly pdvRepository: PdvRepository,
-    @Inject('ShippingService')
+    @Inject('CachedShippingService')
     private shippingService: ShippingService,
     @Inject('LocationService')
     private locationService: LocationService,
