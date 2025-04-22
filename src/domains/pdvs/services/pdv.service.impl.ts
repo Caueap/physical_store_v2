@@ -50,7 +50,6 @@ export class PdvServiceImpl implements PdvService {
       
       const pdvData = {
         ...createPdvDto,
-        store: createPdvDto.parentStoreId,
       };
 
       return await this.pdvRepository.create(pdvData);
