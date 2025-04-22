@@ -110,7 +110,7 @@ describe('PdvServiceImpl', () => {
       expect(pdvRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
           storeName: 'New PDV',
-          store: mockStoreId,
+          parentStoreId: mockStoreId,
         })
       );
     });

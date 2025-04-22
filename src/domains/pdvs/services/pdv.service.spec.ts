@@ -162,7 +162,7 @@ describe('PdvService', () => {
       expect(result).toEqual(mockCreatedPdv);
       expect(repository.create).toHaveBeenCalledWith(expect.objectContaining({
         storeName: 'New PDV',
-        store: storeId
+        parentStoreId: storeId
       }));
     });
   });

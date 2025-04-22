@@ -84,16 +84,17 @@ export class PdvRepositoryImpl implements PdvRepository {
   }
 
   async create(createPdvDto: CreatePdvDto): Promise<Pdv> {
+    const { parentStoreId, ...pdvDataWithoutParentId } = createPdvDto;
     const pdvData = {
-      ...createPdvDto,
-      store: new Types.ObjectId(createPdvDto.parentStoreId)
+      ...pdvDataWithoutParentId,
+      store: new Types.ObjectId(parentStoreId)
     };
     
     const newPdv = new this.pdvModel(pdvData);
     const savedPdv = await newPdv.save();
     
     await this.storeModel.findByIdAndUpdate(
-      pdvData.store,
+      savedPdv.store,
       { $push: { pdvs: savedPdv._id } }
     );
     

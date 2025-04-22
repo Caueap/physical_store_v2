@@ -48,11 +48,7 @@ export class PdvServiceImpl implements PdvService {
         });
       }
       
-      const pdvData = {
-        ...createPdvDto,
-      };
-
-      return await this.pdvRepository.create(pdvData);
+      return await this.pdvRepository.create(createPdvDto);
     } catch (error) {
       this.logger.error(`Error creating PDV: ${error.message}`, error.stack);
       if (error instanceof BadRequestException) {

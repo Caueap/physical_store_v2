@@ -229,7 +229,7 @@ describe('PdvRepositoryImpl', () => {
       expect(result).toEqual(savedPdv);
       expect(saveMock).toHaveBeenCalled();
       expect(storeModel.findByIdAndUpdate).toHaveBeenCalledWith(
-        mockStoreId,
+        savedPdv.store,
         expect.objectContaining({ 
           $push: expect.objectContaining({ 
             pdvs: expect.anything() 
