@@ -4,11 +4,14 @@ import { Model, Types } from 'mongoose';
 import { Pdv } from '../../../domains/pdvs/entities/pdv.entity';
 import { PdvRepository } from '../../../domains/pdvs/repository/pdv.repository';
 import { Store } from '../../../domains/stores/entities/store.entity';
-import { getFullStateName } from 'src/utils/functions';
-import { paginate } from 'src/utils/functions';
+import { getFullStateName } from '../../../utils/functions';
+import { paginate } from '../../../utils/functions';
+import { Logger } from '@nestjs/common';
 
 @Injectable()
 export class PdvRepositoryImpl implements PdvRepository {
+  private readonly logger = new Logger(PdvRepositoryImpl.name);
+
   constructor(
     @InjectModel(Pdv.name) private pdvModel: Model<Pdv>,
     @InjectModel(Store.name) private storeModel: Model<Store>,
@@ -98,15 +101,26 @@ export class PdvRepositoryImpl implements PdvRepository {
   }
 
   async delete(id: string | Types.ObjectId): Promise<boolean> {
-    const pdv = await this.pdvModel.findById(id);
-    if (!pdv) return false;
-    
-    await this.storeModel.findByIdAndUpdate(
-      pdv.store,
-      { $pull: { pdvs: pdv._id } }
-    );
-    
-    const result = await this.pdvModel.deleteOne({ _id: id });
-    return result.deletedCount === 1;
+    try {
+      const pdv = await this.findById(id);
+      
+      if (!pdv) {
+        return false;
+      }
+      
+      const storeId = pdv.store;
+      
+      await this.pdvModel.findByIdAndDelete(id);
+      
+      await this.storeModel.findByIdAndUpdate(
+        storeId,
+        { $pull: { pdvs: id } }
+      );
+      
+      return true;
+    } catch (error) {
+      this.logger.error(`Error deleting PDV with id ${id}: ${error.message}`);
+      throw error;
+    }
   }
 } 
