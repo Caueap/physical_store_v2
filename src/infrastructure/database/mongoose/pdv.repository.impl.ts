@@ -7,6 +7,8 @@ import { Store } from '../../../domains/stores/entities/store.entity';
 import { getFullStateName } from '../../../utils/functions';
 import { paginate } from '../../../utils/functions';
 import { Logger } from '@nestjs/common';
+import { CreatePdvDto } from '../../../domains/pdvs/dtos/create-pdv.dto';
+import { UpdatePdvDto } from '../../../domains/pdvs/dtos/update-pdv.dto';
 
 @Injectable()
 export class PdvRepositoryImpl implements PdvRepository {
@@ -83,21 +85,33 @@ export class PdvRepositoryImpl implements PdvRepository {
   }
 
  
-
-  async create(pdv: Partial<Pdv>): Promise<Pdv> {
-    const newPdv = new this.pdvModel(pdv);
+  async create(createPdvDto: CreatePdvDto): Promise<Pdv> {
+    const pdvData = {
+      ...createPdvDto,
+      store: new Types.ObjectId(createPdvDto.store)
+    };
+    
+    const newPdv = new this.pdvModel(pdvData);
     const savedPdv = await newPdv.save();
     
     await this.storeModel.findByIdAndUpdate(
-      pdv.store,
+      pdvData.store,
       { $push: { pdvs: savedPdv._id } }
     );
     
     return savedPdv;
   }
 
-  async update(id: string | Types.ObjectId, pdv: Partial<Pdv>): Promise<Pdv | null> {
-    return this.pdvModel.findByIdAndUpdate(id, pdv, { new: true }).exec();
+  async update(id: string | Types.ObjectId, updatePdvDto: UpdatePdvDto): Promise<Pdv | null> {
+    const { store, ...restOfUpdateData } = updatePdvDto;
+    
+    const updateData: Partial<Pdv> = { ...restOfUpdateData };
+    
+    if (store) {
+      updateData.store = new Types.ObjectId(store);
+    }
+    
+    return this.pdvModel.findByIdAndUpdate(id, updateData, { new: true }).exec();
   }
 
   async delete(id: string | Types.ObjectId): Promise<boolean> {
