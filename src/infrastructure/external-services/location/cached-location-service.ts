@@ -9,7 +9,7 @@ import { Cache } from 'cache-manager';
 import { CacheConfigService } from '../../../common/cache/cache-config.service';
 import { DistanceResult } from '../distance/types/distance-result.type';
 import { Coordinates } from '../geocoding/types/coordinates.type';
-import { LocationPoint } from '../../../domains/stores/interfaces/location-point.interface';
+import { LocationPoint } from '../../../common/interfaces/location-point.interface'
 
 @Injectable()
 export class CachedLocationServiceImpl implements LocationService {

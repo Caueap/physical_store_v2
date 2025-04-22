@@ -51,8 +51,20 @@ export class PdvController {
   }
 
   @Get('by-cep/:cep')
-  async getPdvsByCep(@Param('cep') cep: string) {
-    return this.pdvService.getPdvsByCep(cep);
+  async getPdvsByCep(
+    @Param('cep') cep: string,
+    @Query(new ValidationPipe({ 
+      transform: true, 
+      transformOptions: { enableImplicitConversion: true },
+      forbidNonWhitelisted: true,
+      whitelist: true,
+      skipMissingProperties: true,
+    })) 
+    query: GetAllPdvsDto = {}
+  ) {
+    const limit = query.limit ?? 10;
+    const offset = query.offset ?? 0;
+    return this.pdvService.getPdvsByCep(cep, limit, offset);
   }
 
   @Get('id/:id')

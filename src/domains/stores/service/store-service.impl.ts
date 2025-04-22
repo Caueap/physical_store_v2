@@ -6,7 +6,7 @@ import { LocationService } from '../../../infrastructure/external-services/locat
 import { StoresByCepResponse } from '../types/stores-by-cep-response.interface';
 import { Store } from '../entities/store.entity';
 import { CreateStoreDto } from '../dtos/create-store.dto';
-import { LocationPoint } from '../types/location-point.type';
+import { LocationPoint } from '../../../common/interfaces/location-point.interface';
 import { paginate } from '../../../utils/functions';
 import { StoreService } from './store-service.interface';
 import { UpdateStoreDto } from '../dtos/update-store.dto';
@@ -234,19 +234,11 @@ export class StoreServiceImpl implements StoreService {
     try {
       this.logger.log(`Creating store with name: ${createStoreDto.storeName}`);
       
-      const errors: string[] = [];
-      
       if (createStoreDto.latitude && createStoreDto.longitude) {
-        try {
-          await this.validateStoreLocation(
-            createStoreDto.latitude,
-            createStoreDto.longitude
-          );
-        } catch (error) {
-          if (error instanceof BusinessRuleException) {
-            errors.push(error.message);
-          }
-        }
+        await this.validateStoreLocation(
+          createStoreDto.latitude,
+          createStoreDto.longitude
+        );
       }
       
       const { stores } = await this.storeRepository.findAll(1000, 0);
@@ -255,21 +247,18 @@ export class StoreServiceImpl implements StoreService {
       );
       
       if (existingStore) {
-        errors.push(`A store with the name "${createStoreDto.storeName}" already exists`);
-      }
-      
-      if (errors.length > 0) {
         throw new BadRequestException({
           statusCode: 400,
           error: "Bad Request",
           message: "Validation failed",
-          errors: errors
+          errors: [`A store with the name "${createStoreDto.storeName}" already exists`]
         });
       }
       
       return await this.storeRepository.create(createStoreDto);
     } catch (error) {
       this.logger.error(`Error creating store: ${error.message}`, error.stack);
+      
       if (error instanceof BusinessRuleException) {
         throw error;
       }

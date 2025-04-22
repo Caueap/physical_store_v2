@@ -120,7 +120,10 @@ export class PdvServiceImpl implements PdvService {
   async delete(id: string | Types.ObjectId): Promise<boolean> {
     this.logger.log(`Deleting PDV with ID: ${id}`);
     
-    await this.pdvRepository.findById(id);
+    const pdv = await this.pdvRepository.findById(id);
+    if (!pdv) {
+      throw new NotFoundException(`PDV with ID ${id} not found`);
+    }
 
     return this.pdvRepository.delete(id);
   }
