@@ -75,9 +75,4 @@ export class CreatePdvDto {
   @IsOptional()
   @IsEmail()
   emailAddress?: string;
-
-  @ApiProperty({ description: 'The ID of the store that this PDV belongs to', example: '60a1e2c5c5e4b02f68c15a1c' })
-  @IsNotEmpty()
-  @IsMongoId()
-  store: string;
 } 

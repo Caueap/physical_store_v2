@@ -27,9 +27,8 @@ export class PdvRepositoryImpl implements PdvRepository {
     return this.pdvModel.findById(id).exec();
   }
 
-
   async findByStoreId(storeId: string | Types.ObjectId): Promise<Pdv[]> {
-    return this.pdvModel.find({ storeId }).exec();
+    return this.pdvModel.find({ store: storeId }).exec();
   }
 
   async findByState(state?: string, limit = 10, offset = 0): Promise<any> {
@@ -84,11 +83,10 @@ export class PdvRepositoryImpl implements PdvRepository {
     }, {} as Record<string, any[]>);
   }
 
- 
   async create(createPdvDto: CreatePdvDto): Promise<Pdv> {
     const pdvData = {
       ...createPdvDto,
-      store: new Types.ObjectId(createPdvDto.store)
+      store: new Types.ObjectId(createPdvDto.parentStoreId)
     };
     
     const newPdv = new this.pdvModel(pdvData);
